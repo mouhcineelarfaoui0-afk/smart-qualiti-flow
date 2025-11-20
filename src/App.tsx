@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import NonConformities from "./pages/NonConformities";
+import Audits from "./pages/Audits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +23,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/non-conformities" element={<NonConformities />} />
-              <Route path="/audits" element={<div className="text-center py-20 text-muted-foreground">Module Audits - En construction</div>} />
+              <Route path="/audits" element={<Audits />} />
               <Route path="/documents" element={<div className="text-center py-20 text-muted-foreground">Module Documents - En construction</div>} />
               <Route path="/ai-assistant" element={<div className="text-center py-20 text-muted-foreground">Assistant IA - En construction</div>} />
               <Route path="/settings" element={<div className="text-center py-20 text-muted-foreground">Paramètres - En construction</div>} />
