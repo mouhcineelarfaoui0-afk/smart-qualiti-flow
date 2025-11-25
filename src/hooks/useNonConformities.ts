@@ -37,11 +37,11 @@ export const useNonConformities = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["non-conformities"] });
       toast({
         title: "Non-conformité créée",
-        description: "La non-conformité a été créée avec succès.",
+        description: `NC ${data.nc_number} créée avec succès.`,
       });
     },
     onError: (error) => {
@@ -126,8 +126,8 @@ export const useNonConformities = () => {
   return {
     nonConformities,
     isLoading,
-    createNonConformity: createMutation.mutate,
-    updateNonConformity: updateMutation.mutate,
+    createNonConformity: createMutation.mutateAsync,
+    updateNonConformity: updateMutation.mutateAsync,
     deleteNonConformity: deleteMutation.mutate,
     uploadFile,
     isCreating: createMutation.isPending,

@@ -1,7 +1,8 @@
-import { Home, AlertTriangle, ClipboardCheck, FileText, Brain, Settings, Menu } from "lucide-react";
+import { Home, AlertTriangle, ClipboardCheck, FileText, Brain, Settings, Menu, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const menuItems = [
   { icon: Home, label: "Accueil", path: "/" },
@@ -14,19 +15,25 @@ const menuItems = [
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { signOut, user } = useAuth();
 
   return (
     <aside className={`${collapsed ? "w-20" : "w-64"} bg-card border-r border-border transition-all duration-300 flex flex-col`}>
-      <div className="p-6 border-b border-border flex items-center justify-between">
-        {!collapsed && <h1 className="text-xl font-bold text-primary">SmartQuali</h1>}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
+      <div className="p-6 border-b border-border">
+        <div className="flex items-center justify-between mb-2">
+          {!collapsed && <h1 className="text-xl font-bold text-primary">SmartQuali</h1>}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className={collapsed ? "" : "ml-auto"}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
+        {!collapsed && user && (
+          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+        )}
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
@@ -48,13 +55,34 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      {!collapsed && (
-        <div className="p-4 border-t border-border">
-          <div className="text-xs text-muted-foreground">
-            © 2025 SmartQuali
+      <div className="border-t border-border">
+        {!collapsed ? (
+          <div className="p-4 space-y-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={signOut}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Déconnexion
+            </Button>
+            <div className="text-xs text-muted-foreground text-center">
+              © 2025 SmartQuali
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="p-4 flex justify-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={signOut}
+              title="Déconnexion"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
     </aside>
   );
 };
