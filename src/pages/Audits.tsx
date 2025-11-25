@@ -1,183 +1,296 @@
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Plus, 
+  Search, 
+  Calendar, 
+  User, 
+  Edit, 
+  Trash2,
+  FileText,
+  Download
+} from "lucide-react";
+import { useAudits } from "@/hooks/useAudits";
+import { AuditDialog } from "@/components/AuditDialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import type { Tables } from "@/integrations/supabase/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const Audits = () => {
-  const mockAudits = [
-    {
-      id: "AUD-2025-001",
-      title: "Audit interne ISO 9001",
-      type: "Interne",
-      status: "Planifié",
-      date: "15 Jan 2025",
-      auditor: "Marie Dupont",
-      department: "Production",
-    },
-    {
-      id: "AUD-2025-002",
-      title: "Audit fournisseur ABC Corp",
-      type: "Fournisseur",
-      status: "En cours",
-      date: "20 Jan 2025",
-      auditor: "Jean Martin",
-      department: "Achats",
-    },
-    {
-      id: "AUD-2025-003",
-      title: "Audit processus qualité",
-      type: "Processus",
-      status: "Complété",
-      date: "10 Jan 2025",
-      auditor: "Sophie Bernard",
-      department: "Qualité",
-    },
-  ];
+export default function Audits() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedAudit, setSelectedAudit] = useState<Tables<"audits"> | undefined>();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { audits, isLoading, deleteAudit } = useAudits();
+
+  const filteredAudits = audits?.filter(audit =>
+    audit.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    audit.audit_number.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleEdit = (audit: Tables<"audits">) => {
+    setSelectedAudit(audit);
+    setDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedAudit(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteAudit(id);
+    setDeleteId(null);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Complété":
-        return "bg-success/10 text-success border-success/20";
-      case "En cours":
-        return "bg-warning/10 text-warning border-warning/20";
-      case "Planifié":
-        return "bg-primary/10 text-primary border-primary/20";
+      case "planifie":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+      case "en_cours":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "termine":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "reporte":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
       default:
-        return "bg-secondary text-secondary-foreground";
+        return "";
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Complété":
-        return <CheckCircle className="h-4 w-4" />;
-      case "En cours":
-        return <Clock className="h-4 w-4" />;
-      case "Planifié":
-        return <Calendar className="h-4 w-4" />;
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "interne":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+      case "externe":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "fournisseur":
+        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200";
+      case "client":
+        return "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200";
       default:
-        return <AlertCircle className="h-4 w-4" />;
+        return "";
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      planifie: "Planifié",
+      en_cours: "En cours",
+      termine: "Terminé",
+      reporte: "Reporté",
+    };
+    return labels[status] || status;
+  };
+
+  const getTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      interne: "Interne",
+      externe: "Externe",
+      fournisseur: "Fournisseur",
+      client: "Client",
+    };
+    return labels[type] || type;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  const stats = {
+    total: audits?.length || 0,
+    planned: audits?.filter(a => a.status === "planifie").length || 0,
+    inProgress: audits?.filter(a => a.status === "en_cours").length || 0,
+    completed: audits?.filter(a => a.status === "termine").length || 0,
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Audits</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Audits</h1>
           <p className="text-muted-foreground">
-            Gestion et suivi des audits qualité
+            Planification et suivi des audits qualité
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Calendrier
-          </Button>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nouvel audit
-          </Button>
-        </div>
+        <Button onClick={handleCreate} size="lg">
+          <Plus className="mr-2 h-4 w-4" />
+          Nouvel Audit
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total</p>
-              <p className="text-2xl font-bold text-foreground">24</p>
-            </div>
-            <FileText className="h-8 w-8 text-muted-foreground" />
-          </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+          </CardContent>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Planifiés</p>
-              <p className="text-2xl font-bold text-primary">8</p>
-            </div>
-            <Calendar className="h-8 w-8 text-primary" />
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Planifiés</CardTitle>
+            <Calendar className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{stats.planned}</div>
+          </CardContent>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">En cours</p>
-              <p className="text-2xl font-bold text-warning">3</p>
-            </div>
-            <Clock className="h-8 w-8 text-warning" />
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">En cours</CardTitle>
+            <div className="h-3 w-3 rounded-full bg-yellow-500 animate-pulse" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{stats.inProgress}</div>
+          </CardContent>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Complétés</p>
-              <p className="text-2xl font-bold text-success">13</p>
-            </div>
-            <CheckCircle className="h-8 w-8 text-success" />
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Terminés</CardTitle>
+            <div className="h-3 w-3 rounded-full bg-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+          </CardContent>
         </Card>
       </div>
 
-      {/* Audits List */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-foreground">
-            Audits récents
-          </h2>
-          <Button variant="ghost" size="sm">
-            Voir tout
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {mockAudits.map((audit) => (
-            <div
-              key={audit.id}
-              className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg hover:bg-secondary/50 transition-colors"
-            >
-              <div className="flex items-center gap-4 flex-1">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <FileText className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-foreground">{audit.id}</p>
-                    <Badge variant="outline" className="text-xs">
-                      {audit.type}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-foreground mb-1">{audit.title}</p>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {audit.date}
-                    </span>
-                    <span>{audit.auditor}</span>
-                    <span>{audit.department}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge
-                  variant="outline"
-                  className={`${getStatusColor(audit.status)} flex items-center gap-1`}
-                >
-                  {getStatusIcon(audit.status)}
-                  {audit.status}
-                </Badge>
-                <Button variant="ghost" size="sm">
-                  Détails
-                </Button>
-              </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par titre ou numéro..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          ))}
-        </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {filteredAudits && filteredAudits.length > 0 ? (
+            <div className="space-y-4">
+              {filteredAudits.map((audit) => (
+                <Card key={audit.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="font-mono">
+                            {audit.audit_number}
+                          </Badge>
+                          <Badge className={getTypeColor(audit.type)}>
+                            {getTypeLabel(audit.type)}
+                          </Badge>
+                          <Badge className={getStatusColor(audit.status)}>
+                            {getStatusLabel(audit.status)}
+                          </Badge>
+                        </div>
+                        
+                        <h3 className="text-lg font-semibold">{audit.title}</h3>
+                        
+                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>{format(new Date(audit.audit_date), "dd MMMM yyyy", { locale: fr })}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            <span>Auditeur: {audit.auditor_id.slice(0, 8)}...</span>
+                          </div>
+                          {audit.score !== null && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">Score:</span>
+                              <span className={audit.score >= 80 ? "text-green-600" : audit.score >= 60 ? "text-yellow-600" : "text-red-600"}>
+                                {audit.score}%
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {audit.observations && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {audit.observations}
+                          </p>
+                        )}
+
+                        {audit.report_url && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={audit.report_url} target="_blank" rel="noopener noreferrer">
+                              <Download className="mr-2 h-4 w-4" />
+                              Télécharger le rapport
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(audit)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeleteId(audit.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              Aucun audit enregistré
+            </div>
+          )}
+        </CardContent>
       </Card>
+
+      <AuditDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        audit={selectedAudit}
+      />
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer cet audit ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId)}>
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-};
-
-export default Audits;
+}
