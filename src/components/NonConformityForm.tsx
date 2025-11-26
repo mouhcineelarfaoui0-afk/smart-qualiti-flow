@@ -96,15 +96,15 @@ export const NonConformityForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-5">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Titre *</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Titre *</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Défaut d'emballage produit A" {...field} />
+                <Input placeholder="Ex: Défaut d'emballage produit A" {...field} className="h-11 sm:h-10" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -116,11 +116,11 @@ export const NonConformityForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description *</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Description *</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Décrivez en détail la non-conformité..."
-                  className="min-h-[100px]"
+                  className="min-h-[120px] sm:min-h-[100px]"
                   {...field}
                 />
               </FormControl>
@@ -129,13 +129,13 @@ export const NonConformityForm = ({
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="priority"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Priorité *</FormLabel>
+            <FormItem>
+              <FormLabel className="text-sm sm:text-base">Priorité *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -158,8 +158,8 @@ export const NonConformityForm = ({
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Statut *</FormLabel>
+            <FormItem>
+              <FormLabel className="text-sm sm:text-base">Statut *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -185,13 +185,13 @@ export const NonConformityForm = ({
           name="due_date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date d'échéance</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Date d'échéance</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal"
+                      className="w-full justify-start text-left font-normal h-11 sm:h-10"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {field.value ? (
@@ -222,11 +222,11 @@ export const NonConformityForm = ({
           name="cause"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cause</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Cause</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Analyse de la cause..."
-                  className="min-h-[80px]"
+                  className="min-h-[100px] sm:min-h-[80px]"
                   {...field}
                 />
               </FormControl>
@@ -240,11 +240,11 @@ export const NonConformityForm = ({
           name="corrective_action"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Action corrective</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Action corrective</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Actions correctives proposées..."
-                  className="min-h-[80px]"
+                  className="min-h-[100px] sm:min-h-[80px]"
                   {...field}
                 />
               </FormControl>
@@ -254,15 +254,15 @@ export const NonConformityForm = ({
         />
 
         <div>
-          <FormLabel>Pièce jointe</FormLabel>
+          <FormLabel className="text-sm sm:text-base">Pièce jointe</FormLabel>
           <div className="mt-2">
             <label
               htmlFor="file-upload"
-              className="flex items-center justify-center w-full p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors"
+              className="flex items-center justify-center w-full p-4 sm:p-5 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors"
             >
               <div className="text-center">
-                <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
+                <Upload className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mb-2" />
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Cliquez pour télécharger un fichier (max 10 MB)
                 </p>
               </div>
@@ -275,13 +275,14 @@ export const NonConformityForm = ({
               />
             </label>
             {selectedFile && (
-              <div className="flex items-center justify-between mt-2 p-2 bg-secondary rounded">
-                <span className="text-sm">{selectedFile.name}</span>
+              <div className="flex items-center justify-between mt-2 p-2 sm:p-3 bg-secondary rounded">
+                <span className="text-xs sm:text-sm truncate flex-1 mr-2">{selectedFile.name}</span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedFile(null)}
+                  className="h-8 w-8 p-0 flex-shrink-0"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -291,14 +292,14 @@ export const NonConformityForm = ({
         </div>
 
         {form.formState.errors.root && (
-          <p className="text-sm text-destructive">
+          <p className="text-xs sm:text-sm text-destructive">
             {form.formState.errors.root.message}
           </p>
         )}
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Enregistrement..." : initialData ? "Mettre à jour" : "Créer"}
+          <Button type="submit" disabled={isLoading} className="h-11 sm:h-10 px-6 sm:px-4">
+            <span className="text-sm sm:text-base">{isLoading ? "Enregistrement..." : initialData ? "Mettre à jour" : "Créer"}</span>
           </Button>
         </div>
       </form>

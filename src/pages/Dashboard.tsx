@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Tableau de bord</h1>
-        <p className="text-muted-foreground">Vue d'ensemble de votre système qualité</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Tableau de bord</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Vue d'ensemble de votre système qualité</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <KPICard
           title="Non-conformités ouvertes"
           value={12}
@@ -64,11 +64,11 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Non-conformités récentes</h2>
-            <Button variant="ghost" size="sm">Voir tout</Button>
+            <h2 className="text-base sm:text-lg font-semibold text-foreground">Non-conformités récentes</h2>
+            <Button variant="ghost" size="sm" className="text-xs sm:text-sm">Voir tout</Button>
           </div>
           <div className="space-y-3">
             {[
@@ -76,31 +76,29 @@ const Dashboard = () => {
               { id: "NC-2025-002", title: "Non-respect procédure contrôle", status: "En cours", priority: "Moyenne" },
               { id: "NC-2025-003", title: "Écart température stockage", status: "Ouverte", priority: "Haute" },
             ].map((nc) => (
-              <div key={nc.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
-                <div>
+              <div key={nc.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-secondary/50 rounded-lg gap-2">
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-foreground">{nc.id}</p>
-                  <p className="text-xs text-muted-foreground">{nc.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{nc.title}</p>
                 </div>
-                <div className="flex gap-2">
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      nc.priority === "Haute"
-                        ? "bg-destructive/10 text-destructive"
-                        : "bg-warning/10 text-warning"
-                    }`}
-                  >
-                    {nc.priority}
-                  </span>
-                </div>
+                <span
+                  className={`text-xs px-2 py-1 rounded whitespace-nowrap self-start sm:self-auto ${
+                    nc.priority === "Haute"
+                      ? "bg-destructive/10 text-destructive"
+                      : "bg-warning/10 text-warning"
+                  }`}
+                >
+                  {nc.priority}
+                </span>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Prochains audits</h2>
-            <Button variant="ghost" size="sm">Calendrier</Button>
+            <h2 className="text-base sm:text-lg font-semibold text-foreground">Prochains audits</h2>
+            <Button variant="ghost" size="sm" className="text-xs sm:text-sm">Calendrier</Button>
           </div>
           <div className="space-y-3">
             {[
@@ -108,12 +106,12 @@ const Dashboard = () => {
               { title: "Audit fournisseur", date: "22 Jan 2025", auditor: "Jean Martin" },
               { title: "Audit processus production", date: "29 Jan 2025", auditor: "Sophie Bernard" },
             ].map((audit, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
-                <div>
+              <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-secondary/50 rounded-lg gap-2">
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-foreground">{audit.title}</p>
-                  <p className="text-xs text-muted-foreground">Auditeur: {audit.auditor}</p>
+                  <p className="text-xs text-muted-foreground truncate">Auditeur: {audit.auditor}</p>
                 </div>
-                <div className="text-xs font-medium text-primary">{audit.date}</div>
+                <div className="text-xs font-medium text-primary whitespace-nowrap">{audit.date}</div>
               </div>
             ))}
           </div>
@@ -121,24 +119,24 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <Button className="w-full justify-start" variant="outline">
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Déclarer NC
+      <Card className="p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Actions rapides</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Button className="w-full justify-start h-12 sm:h-10" variant="outline">
+            <AlertTriangle className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+            <span className="text-sm sm:text-base">Déclarer NC</span>
           </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <ClipboardCheck className="mr-2 h-4 w-4" />
-            Planifier audit
+          <Button className="w-full justify-start h-12 sm:h-10" variant="outline">
+            <ClipboardCheck className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+            <span className="text-sm sm:text-base">Planifier audit</span>
           </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <FileText className="mr-2 h-4 w-4" />
-            Créer document
+          <Button className="w-full justify-start h-12 sm:h-10" variant="outline">
+            <FileText className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+            <span className="text-sm sm:text-base">Créer document</span>
           </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <Brain className="mr-2 h-4 w-4" />
-            Assistant IA
+          <Button className="w-full justify-start h-12 sm:h-10" variant="outline">
+            <Brain className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+            <span className="text-sm sm:text-base">Assistant IA</span>
           </Button>
         </div>
       </Card>

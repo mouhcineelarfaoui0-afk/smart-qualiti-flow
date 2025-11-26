@@ -44,16 +44,16 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">SmartQuali</CardTitle>
-          <CardDescription>
+        <CardHeader className="space-y-1 sm:space-y-2">
+          <CardTitle className="text-xl sm:text-2xl font-bold">SmartQuali</CardTitle>
+          <CardDescription className="text-sm">
             Connectez-vous à votre compte pour accéder au système de gestion qualité
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -62,10 +62,11 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11 sm:h-10"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password" className="text-sm sm:text-base">Mot de passe</Label>
               <Input
                 id="password"
                 type="password"
@@ -73,11 +74,12 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11 sm:h-10"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11 sm:h-10" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Se connecter
+              <span className="text-sm sm:text-base">Se connecter</span>
             </Button>
             <p className="text-sm text-center text-muted-foreground">
               Pas encore de compte ?{" "}

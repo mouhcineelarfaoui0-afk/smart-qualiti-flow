@@ -31,14 +31,14 @@ const App = () => (
                 <ProtectedRoute>
                   <div className="flex min-h-screen w-full bg-background">
                     <Sidebar />
-                    <main className="flex-1 p-8 overflow-auto">
+                    <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/non-conformities" element={<NonConformities />} />
                         <Route path="/audits" element={<Audits />} />
-                        <Route path="/documents" element={<div className="text-center py-20 text-muted-foreground">Module Documents - En construction</div>} />
-                        <Route path="/ai-assistant" element={<div className="text-center py-20 text-muted-foreground">Assistant IA - En construction</div>} />
-                        <Route path="/settings" element={<div className="text-center py-20 text-muted-foreground">Paramètres - En construction</div>} />
+                        <Route path="/documents" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Module Documents - En construction</div>} />
+                        <Route path="/ai-assistant" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Assistant IA - En construction</div>} />
+                        <Route path="/settings" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Paramètres - En construction</div>} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>
