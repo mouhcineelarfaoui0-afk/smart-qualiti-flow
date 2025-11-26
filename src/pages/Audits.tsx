@@ -116,28 +116,28 @@ export default function Audits() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Audits</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Audits</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Planification et suivi des audits qualité
           </p>
         </div>
-        <Button onClick={handleCreate} size="lg">
-          <Plus className="mr-2 h-4 w-4" />
-          Nouvel Audit
+        <Button onClick={handleCreate} className="h-11 sm:h-10 w-full sm:w-auto">
+          <Plus className="mr-2 h-5 w-5 sm:h-4 sm:w-4" />
+          <span className="text-sm sm:text-base">Nouvel Audit</span>
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
         <Card>

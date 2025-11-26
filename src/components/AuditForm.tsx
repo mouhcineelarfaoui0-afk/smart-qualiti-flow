@@ -72,28 +72,28 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-5">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Titre de l'audit</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Titre de l'audit</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Audit interne ISO 9001" {...field} />
+                <Input placeholder="Ex: Audit interne ISO 9001" {...field} className="h-11 sm:h-10" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Type d'audit</FormLabel>
+                <FormLabel className="text-sm sm:text-base">Type d'audit</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -117,7 +117,7 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Statut</FormLabel>
+                <FormLabel className="text-sm sm:text-base">Statut</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -137,20 +137,20 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="audit_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Date d'audit</FormLabel>
+                <FormLabel className="text-sm sm:text-base">Date d'audit</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="outline"
                         className={cn(
-                          "pl-3 text-left font-normal",
+                          "pl-3 text-left font-normal h-11 sm:h-10",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -183,9 +183,9 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
             name="auditor_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ID Auditeur</FormLabel>
+                <FormLabel className="text-sm sm:text-base">ID Auditeur</FormLabel>
                 <FormControl>
-                  <Input placeholder="ID de l'auditeur" {...field} />
+                  <Input placeholder="ID de l'auditeur" {...field} className="h-11 sm:h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -198,7 +198,7 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
           name="score"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Score (0-100)</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Score (0-100)</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -208,6 +208,7 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
                   {...field}
                   onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                   value={field.value || ""}
+                  className="h-11 sm:h-10"
                 />
               </FormControl>
               <FormMessage />
@@ -220,11 +221,11 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
           name="observations"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Observations</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Observations</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Notes et observations de l'audit"
-                  className="min-h-[100px]"
+                  className="min-h-[120px] sm:min-h-[100px]"
                   {...field}
                 />
               </FormControl>
@@ -234,13 +235,13 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
         />
 
         <div className="space-y-2">
-          <FormLabel>Rapport d'audit (PDF)</FormLabel>
-          <div className="flex items-center gap-2">
+          <FormLabel className="text-sm sm:text-base">Rapport d'audit (PDF)</FormLabel>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <Input
               type="file"
               accept=".pdf"
               onChange={handleFileChange}
-              className="flex-1"
+              className="flex-1 h-11 sm:h-10"
             />
             {selectedFile && (
               <Button
@@ -248,27 +249,28 @@ export const AuditForm = ({ onSubmit, initialData, isLoading }: AuditFormProps) 
                 variant="ghost"
                 size="icon"
                 onClick={() => setSelectedFile(null)}
+                className="h-11 w-11 sm:h-10 sm:w-10 self-end sm:self-auto"
               >
                 <X className="h-4 w-4" />
               </Button>
             )}
           </div>
           {selectedFile && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
               Fichier sélectionné: {selectedFile.name}
             </p>
           )}
         </div>
 
         {form.formState.errors.root && (
-          <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+          <p className="text-xs sm:text-sm text-destructive">{form.formState.errors.root.message}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full h-11 sm:h-10" disabled={isLoading}>
           {isLoading ? (
-            <span>Enregistrement...</span>
+            <span className="text-sm sm:text-base">Enregistrement...</span>
           ) : (
-            <span>{initialData ? "Mettre à jour" : "Créer l'audit"}</span>
+            <span className="text-sm sm:text-base">{initialData ? "Mettre à jour" : "Créer l'audit"}</span>
           )}
         </Button>
       </form>
