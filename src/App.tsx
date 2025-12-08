@@ -9,6 +9,7 @@ import { Sidebar } from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import NonConformities from "./pages/NonConformities";
 import Audits from "./pages/Audits";
+import Documents from "./pages/Documents";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -36,7 +37,7 @@ const App = () => (
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/non-conformities" element={<NonConformities />} />
                         <Route path="/audits" element={<Audits />} />
-                        <Route path="/documents" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Module Documents - En construction</div>} />
+                        <Route path="/documents" element={<Documents />} />
                         <Route path="/ai-assistant" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Assistant IA - En construction</div>} />
                         <Route path="/settings" element={<div className="text-center py-12 sm:py-20 text-muted-foreground px-4">Paramètres - En construction</div>} />
                         <Route path="*" element={<NotFound />} />
