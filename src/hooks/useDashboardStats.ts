@@ -12,7 +12,7 @@ export const useDashboardStats = () => {
 
       const { data: allNCs, error: allError } = await supabase
         .from("non_conformities")
-        .select("id", { count: "exact" });
+        .select("*");
 
       const { data: recentNCs, error: recentError } = await supabase
         .from("non_conformities")
@@ -27,11 +27,51 @@ export const useDashboardStats = () => {
         ? Math.round((closedNCs / allNCs.length) * 100 * 10) / 10 
         : 100;
 
+      // Calculate NC by status for pie chart
+      const statusCounts = {
+        ouverte: 0,
+        en_cours: 0,
+        resolue: 0,
+        cloturee: 0,
+        rejetee: 0,
+      };
+      allNCs?.forEach((nc) => {
+        if (nc.status in statusCounts) {
+          statusCounts[nc.status as keyof typeof statusCounts]++;
+        }
+      });
+
+      // Calculate NC by priority for bar chart
+      const priorityCounts = {
+        basse: 0,
+        moyenne: 0,
+        haute: 0,
+        critique: 0,
+      };
+      allNCs?.forEach((nc) => {
+        if (nc.priority in priorityCounts) {
+          priorityCounts[nc.priority as keyof typeof priorityCounts]++;
+        }
+      });
+
       return {
         openCount: openNCs?.length || 0,
         totalCount: allNCs?.length || 0,
         complianceRate,
         recentNCs: recentNCs || [],
+        statusData: [
+          { name: "Ouverte", value: statusCounts.ouverte, fill: "hsl(var(--chart-1))" },
+          { name: "En cours", value: statusCounts.en_cours, fill: "hsl(var(--chart-2))" },
+          { name: "Résolue", value: statusCounts.resolue, fill: "hsl(var(--chart-3))" },
+          { name: "Clôturée", value: statusCounts.cloturee, fill: "hsl(var(--chart-4))" },
+          { name: "Rejetée", value: statusCounts.rejetee, fill: "hsl(var(--chart-5))" },
+        ].filter(d => d.value > 0),
+        priorityData: [
+          { name: "Basse", value: priorityCounts.basse, fill: "hsl(var(--chart-3))" },
+          { name: "Moyenne", value: priorityCounts.moyenne, fill: "hsl(var(--chart-2))" },
+          { name: "Haute", value: priorityCounts.haute, fill: "hsl(var(--chart-1))" },
+          { name: "Critique", value: priorityCounts.critique, fill: "hsl(var(--destructive))" },
+        ],
       };
     },
   });
@@ -49,6 +89,10 @@ export const useDashboardStats = () => {
         .gte("audit_date", startOfMonth.toISOString().split("T")[0])
         .lte("audit_date", endOfMonth.toISOString().split("T")[0]);
 
+      const { data: allAudits, error: allError } = await supabase
+        .from("audits")
+        .select("*");
+
       const { data: upcomingAudits, error: upcomingError } = await supabase
         .from("audits")
         .select("*")
@@ -56,11 +100,30 @@ export const useDashboardStats = () => {
         .order("audit_date", { ascending: true })
         .limit(5);
 
-      if (plannedError || upcomingError) throw plannedError || upcomingError;
+      if (plannedError || upcomingError || allError) throw plannedError || upcomingError || allError;
+
+      // Calculate audit types for chart
+      const typeCounts = {
+        interne: 0,
+        externe: 0,
+        fournisseur: 0,
+        client: 0,
+      };
+      allAudits?.forEach((audit) => {
+        if (audit.type in typeCounts) {
+          typeCounts[audit.type as keyof typeof typeCounts]++;
+        }
+      });
 
       return {
         plannedCount: plannedAudits?.length || 0,
         upcomingAudits: upcomingAudits || [],
+        typeData: [
+          { name: "Interne", value: typeCounts.interne, fill: "hsl(var(--chart-1))" },
+          { name: "Externe", value: typeCounts.externe, fill: "hsl(var(--chart-2))" },
+          { name: "Fournisseur", value: typeCounts.fournisseur, fill: "hsl(var(--chart-3))" },
+          { name: "Client", value: typeCounts.client, fill: "hsl(var(--chart-4))" },
+        ].filter(d => d.value > 0),
       };
     },
   });
@@ -68,15 +131,32 @@ export const useDashboardStats = () => {
   const { data: actionStats, isLoading: actionLoading } = useQuery({
     queryKey: ["dashboard-action-stats"],
     queryFn: async () => {
-      const { data: activeActions, error } = await supabase
+      const { data: allActions, error } = await supabase
         .from("actions")
-        .select("id", { count: "exact" })
-        .in("status", ["planifiee", "en_cours"]);
+        .select("*");
 
       if (error) throw error;
 
+      const statusCounts = {
+        planifiee: 0,
+        en_cours: 0,
+        terminee: 0,
+        verifiee: 0,
+      };
+      allActions?.forEach((action) => {
+        if (action.status in statusCounts) {
+          statusCounts[action.status as keyof typeof statusCounts]++;
+        }
+      });
+
       return {
-        activeCount: activeActions?.length || 0,
+        activeCount: allActions?.filter(a => a.status === "planifiee" || a.status === "en_cours").length || 0,
+        statusData: [
+          { name: "Planifiée", value: statusCounts.planifiee, fill: "hsl(var(--chart-1))" },
+          { name: "En cours", value: statusCounts.en_cours, fill: "hsl(var(--chart-2))" },
+          { name: "Terminée", value: statusCounts.terminee, fill: "hsl(var(--chart-3))" },
+          { name: "Vérifiée", value: statusCounts.verifiee, fill: "hsl(var(--chart-4))" },
+        ].filter(d => d.value > 0),
       };
     },
   });
