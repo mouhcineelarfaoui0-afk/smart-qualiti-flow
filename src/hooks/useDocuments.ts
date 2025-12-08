@@ -29,14 +29,17 @@ export const useDocuments = () => {
     mutationFn: async (document: Omit<DocumentInsert, "created_by" | "document_number">) => {
       if (!user) throw new Error("User not authenticated");
 
-      const { data: docNumber } = await supabase.rpc("generate_document_number");
+      // Generate document number client-side
+      const year = new Date().getFullYear();
+      const timestamp = Date.now().toString().slice(-6);
+      const docNumber = `DOC-${year}-${timestamp}`;
       
       const { data, error } = await supabase
         .from("documents")
         .insert({
           ...document,
           created_by: user.id,
-          document_number: docNumber || `DOC-${Date.now()}`,
+          document_number: docNumber,
         })
         .select()
         .single();
