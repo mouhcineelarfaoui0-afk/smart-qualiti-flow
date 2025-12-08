@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -97,6 +98,179 @@ const Dashboard = () => {
             />
           </>
         )}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* NC by Status Pie Chart */}
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Non-conformités par statut</h2>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <Skeleton className="h-48 w-48 rounded-full" />
+            </div>
+          ) : ncStats?.statusData && ncStats.statusData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={ncStats.statusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                  labelLine={false}
+                >
+                  {ncStats.statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }} 
+                />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              Aucune donnée disponible
+            </div>
+          )}
+        </Card>
+
+        {/* NC by Priority Bar Chart */}
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Non-conformités par priorité</h2>
+          {isLoading ? (
+            <div className="space-y-4 h-64 flex flex-col justify-center">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-8 w-full" />
+              ))}
+            </div>
+          ) : ncStats?.priorityData ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={ncStats.priorityData} layout="vertical">
+                <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  width={80} 
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--foreground))' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }} 
+                />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                  {ncStats.priorityData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              Aucune donnée disponible
+            </div>
+          )}
+        </Card>
+
+        {/* Audit Types Pie Chart */}
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Audits par type</h2>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <Skeleton className="h-48 w-48 rounded-full" />
+            </div>
+          ) : auditStats?.typeData && auditStats.typeData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={auditStats.typeData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                  labelLine={false}
+                >
+                  {auditStats.typeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }} 
+                />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              Aucune donnée d'audit
+            </div>
+          )}
+        </Card>
+
+        {/* Actions Status Bar Chart */}
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Actions CAPA par statut</h2>
+          {isLoading ? (
+            <div className="space-y-4 h-64 flex flex-col justify-center">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-8 w-full" />
+              ))}
+            </div>
+          ) : actionStats?.statusData && actionStats.statusData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={actionStats.statusData} layout="vertical">
+                <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  width={80} 
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--foreground))' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }} 
+                />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                  {actionStats.statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              Aucune action CAPA
+            </div>
+          )}
+        </Card>
       </div>
 
       {/* Recent Activity */}
