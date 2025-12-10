@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-// PDF export hook for dashboard
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
