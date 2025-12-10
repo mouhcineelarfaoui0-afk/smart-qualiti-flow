@@ -1,19 +1,38 @@
 import { KPICard } from "@/components/KPICard";
-import { AlertTriangle, CheckCircle, ClipboardCheck, TrendingUp, Users, FileText, Brain } from "lucide-react";
+import { AlertTriangle, CheckCircle, ClipboardCheck, TrendingUp, Users, FileText, Brain, Download, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useDashboardExport } from "@/hooks/useDashboardExport";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, CartesianGrid, Area, AreaChart } from "recharts";
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [trendPeriod, setTrendPeriod] = useState<"monthly" | "weekly">("monthly");
   const navigate = useNavigate();
   const { ncStats, auditStats, actionStats, documentStats, userStats, isLoading } = useDashboardStats();
+  const { exportToPDF, isExporting } = useDashboardExport();
+
+  const handleExportPDF = async () => {
+    try {
+      await exportToPDF("dashboard-content");
+      toast({
+        title: "Export réussi",
+        description: "Le rapport PDF a été téléchargé avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur d'export",
+        description: "Une erreur est survenue lors de l'export PDF.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getPriorityStyle = (priority: string) => {
     const styles: Record<string, string> = {
@@ -36,10 +55,29 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Tableau de bord</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Vue d'ensemble de votre système qualité</p>
+    <div id="dashboard-content" className="space-y-4 sm:space-y-6 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Tableau de bord</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Vue d'ensemble de votre système qualité</p>
+        </div>
+        <Button
+          onClick={handleExportPDF}
+          disabled={isExporting || isLoading}
+          className="w-full sm:w-auto"
+        >
+          {isExporting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Export en cours...
+            </>
+          ) : (
+            <>
+              <Download className="mr-2 h-4 w-4" />
+              Exporter PDF
+            </>
+          )}
+        </Button>
       </div>
 
       {/* KPI Cards */}
