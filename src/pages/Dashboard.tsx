@@ -7,9 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, CartesianGrid, Area, AreaChart } from "recharts";
+import { useState } from "react";
 
 const Dashboard = () => {
+  const [trendPeriod, setTrendPeriod] = useState<"monthly" | "weekly">("monthly");
   const navigate = useNavigate();
   const { ncStats, auditStats, actionStats, documentStats, userStats, isLoading } = useDashboardStats();
 
@@ -99,6 +101,89 @@ const Dashboard = () => {
           </>
         )}
       </div>
+
+      {/* NC Trend Chart */}
+      <Card className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">Évolution des non-conformités</h2>
+          <div className="flex gap-2">
+            <Button
+              variant={trendPeriod === "monthly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTrendPeriod("monthly")}
+            >
+              Mensuel
+            </Button>
+            <Button
+              variant={trendPeriod === "weekly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTrendPeriod("weekly")}
+            >
+              Hebdomadaire
+            </Button>
+          </div>
+        </div>
+        {isLoading ? (
+          <div className="h-80">
+            <Skeleton className="h-full w-full" />
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={320}>
+            <AreaChart data={trendPeriod === "monthly" ? ncStats?.monthlyTrend : ncStats?.weeklyTrend}>
+              <defs>
+                <linearGradient id="colorCreated" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorClosed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis 
+                dataKey="period" 
+                stroke="hsl(var(--muted-foreground))"
+                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+                tickLine={{ stroke: 'hsl(var(--border))' }}
+              />
+              <YAxis 
+                stroke="hsl(var(--muted-foreground))"
+                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+                tickLine={{ stroke: 'hsl(var(--border))' }}
+                allowDecimals={false}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  color: 'hsl(var(--foreground))'
+                }} 
+              />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="created"
+                name="NC créées"
+                stroke="hsl(var(--chart-1))"
+                fillOpacity={1}
+                fill="url(#colorCreated)"
+                strokeWidth={2}
+              />
+              <Area
+                type="monotone"
+                dataKey="closed"
+                name="NC clôturées"
+                stroke="hsl(var(--chart-3))"
+                fillOpacity={1}
+                fill="url(#colorClosed)"
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </Card>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

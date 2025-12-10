@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { startOfMonth, startOfWeek, format, subMonths, subWeeks, eachMonthOfInterval, eachWeekOfInterval } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export const useDashboardStats = () => {
   const { data: ncStats, isLoading: ncLoading } = useQuery({
@@ -54,11 +56,67 @@ export const useDashboardStats = () => {
         }
       });
 
+      // Calculate monthly trend data (last 12 months)
+      const now = new Date();
+      const monthsAgo = subMonths(now, 11);
+      const months = eachMonthOfInterval({ start: monthsAgo, end: now });
+      
+      const monthlyTrend = months.map((month) => {
+        const monthStart = startOfMonth(month);
+        const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+        
+        const created = allNCs?.filter((nc) => {
+          const createdDate = new Date(nc.created_at || "");
+          return createdDate >= monthStart && createdDate <= monthEnd;
+        }).length || 0;
+        
+        const closed = allNCs?.filter((nc) => {
+          if (!nc.closed_at) return false;
+          const closedDate = new Date(nc.closed_at);
+          return closedDate >= monthStart && closedDate <= monthEnd;
+        }).length || 0;
+
+        return {
+          period: format(month, "MMM yyyy", { locale: fr }),
+          created,
+          closed,
+        };
+      });
+
+      // Calculate weekly trend data (last 12 weeks)
+      const weeksAgo = subWeeks(now, 11);
+      const weeks = eachWeekOfInterval({ start: weeksAgo, end: now }, { weekStartsOn: 1 });
+      
+      const weeklyTrend = weeks.map((week) => {
+        const weekStart = startOfWeek(week, { weekStartsOn: 1 });
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        
+        const created = allNCs?.filter((nc) => {
+          const createdDate = new Date(nc.created_at || "");
+          return createdDate >= weekStart && createdDate <= weekEnd;
+        }).length || 0;
+        
+        const closed = allNCs?.filter((nc) => {
+          if (!nc.closed_at) return false;
+          const closedDate = new Date(nc.closed_at);
+          return closedDate >= weekStart && closedDate <= weekEnd;
+        }).length || 0;
+
+        return {
+          period: format(weekStart, "d MMM", { locale: fr }),
+          created,
+          closed,
+        };
+      });
+
       return {
         openCount: openNCs?.length || 0,
         totalCount: allNCs?.length || 0,
         complianceRate,
         recentNCs: recentNCs || [],
+        monthlyTrend,
+        weeklyTrend,
         statusData: [
           { name: "Ouverte", value: statusCounts.ouverte, fill: "hsl(var(--chart-1))" },
           { name: "En cours", value: statusCounts.en_cours, fill: "hsl(var(--chart-2))" },
